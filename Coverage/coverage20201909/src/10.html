@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\Users\skotak\Downloads\WgQ71cXhQi9TEeqEKVI5E_gluh.c#test\Visual Studio Project\Gluh.CodingTest\Clients\ShippingApiClient.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Gluh.CodingTest
+{
+    /// &lt;summary&gt;
+    /// Simulates calculating a shipping rate from a 3rd party API
+    /// &lt;/summary&gt;
+    public class ShippingApiClient
+    {
+        public decimal GetRate(decimal postalCodeFrom, decimal postalCodeTo, decimal weight)
+        {
+            if (weight &lt;= 5)
+            {
+                return weight * 2.5m;
+            }
+            else if (weight &lt;= 10)
+            {
+                return weight * 1.5m;
+            }
+            else if (weight &lt;= 20)
+            {
+                return weight * 1.25m;
+            }
+            else
+            {
+                return weight * 1.15m;
+            }
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[13,9,13,10,1],[14,13,14,29,1],[15,13,15,14,1],[16,17,16,38,1],[18,18,18,35,1],[19,13,19,14,1],[20,17,20,38,1],[22,18,22,35,1],[23,13,23,14,1],[24,17,24,39,1],[27,13,27,14,1],[28,17,28,39,1],[30,9,30,10,1]]);
+    </script>
+  </body>
+</html>

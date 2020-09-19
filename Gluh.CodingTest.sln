@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gluh.CodingTest", "Gluh.CodingTest\Gluh.CodingTest.csproj", "{13002518-F07F-4180-A1D8-E5CB239B9BFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gluh.UnitTest", "Gluh.UnitTest\Gluh.UnitTest.csproj", "{2E41EEE8-C422-4961-9EAC-958F03F448D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13002518-F07F-4180-A1D8-E5CB239B9BFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13002518-F07F-4180-A1D8-E5CB239B9BFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13002518-F07F-4180-A1D8-E5CB239B9BFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13002518-F07F-4180-A1D8-E5CB239B9BFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E41EEE8-C422-4961-9EAC-958F03F448D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E41EEE8-C422-4961-9EAC-958F03F448D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E41EEE8-C422-4961-9EAC-958F03F448D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E41EEE8-C422-4961-9EAC-958F03F448D7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A87D01A-AD3E-4922-9CBB-D6B557D150F0}
+	EndGlobalSection
+EndGlobal

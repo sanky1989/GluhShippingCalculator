@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\Users\skotak\Downloads\WgQ71cXhQi9TEeqEKVI5E_gluh.c#test\Visual Studio Project\Gluh.CodingTest\ShippingCalculator.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using Gluh.CodingTest.Database;
+
+namespace Gluh.CodingTest
+{
+    public class ShippingCalculator
+    {
+
+        private List&lt;ShippingPriceRate&gt; _priceRates;
+        private List&lt;ShippingWeightRate&gt; _weightRates;
+        private List&lt;ShippingAPIRate&gt; _apiRates;
+
+        public ShippingCalculator()
+        {
+            _priceRates = new List&lt;ShippingPriceRate&gt;
+            {
+                new ShippingPriceRate { PriceMin = 0, PriceMax = 50, Rate = 5.50m },
+                new ShippingPriceRate { PriceMin = 0, PriceMax = 100, Rate = 0.00m },
+                new ShippingPriceRate { PriceMin = 100, PriceMax = 500, Rate = 10.00m },
+                new ShippingPriceRate { PriceMin = 1000, PriceMax = null, Rate = 15.00m },
+            };
+            _weightRates = new List&lt;ShippingWeightRate&gt;
+            {
+                new ShippingWeightRate { WeighMin = 1, WeighMax = 5, Rate = 10.00m },
+                new ShippingWeightRate { WeighMin = 5.01m, WeighMax = 10.00m, Rate = 7.00m },
+                new ShippingWeightRate { WeighMin = 10.00m, WeighMax = null, Rate = 20.00m }
+            };
+            _apiRates = new List&lt;ShippingAPIRate&gt;
+            {
+                new ShippingAPIRate { WeighMin = 10, WeighMax = 30, RateAdjustmentPrice = 5m },
+                new ShippingAPIRate { WeighMin = 30, WeighMax = 35, RateAdjustmentPercent = 7.5m },
+                new ShippingAPIRate { WeighMin = 35, WeighMax = null }
+            };
+        }
+
+        /// &lt;summary&gt;
+        /// Calculates the shipping price for a sales order
+        /// ### Complete this method
+        /// &lt;/summary&gt;
+        /// Assumptions
+        /// Price Based Shipping Rate Calculations: Total Price of all the products in the order is considered to calculate the shipping rate for Price Based Method
+        /// Weight Based Shipping Rate Calcuations: Total Weight of all the products in the order is considered to calculate the shipping rate for Weight Based Method
+        /// API Based Shipping Rate Calcuations: There is little bit confusion on this part of calculations. Here my understanding suggested that if product weighs between 10 to 30 I have added 5m to Weight based calculation
+        /// I thought to get maximum from Price Based and Weight based and add the rate adjustment price to it. Similar approach is used for Rate Adjustment Percent.
+        public decimal Calculate(SalesOrder salesOrder)
+        {
+            //throw new NotImplementedException();
+            decimal shippingCost = 0.00m;
+           
+           // decimal ShippingAPICost = 0.00m;
+            if (salesOrder != null &amp;&amp; salesOrder.Lines.Count() &gt; 0)
+            {
+                decimal TotalPrice =0.00m;
+                decimal TotalWeight = 0.00m;
+
+                foreach (SalesOrderLine orderLine in salesOrder.Lines)
+                {
+                    TotalPrice += (orderLine.Price * orderLine.Quantity);
+                    if (orderLine.Product != null)
+                        TotalWeight += (orderLine.Product.Weight * orderLine.Quantity);
+                }
+
+                ShippingCalculator shippingCalculator = new ShippingCalculator();
+                var ShippingPriceCost = CalculateShippingRate(TotalPrice, shippingCalculator._priceRates);
+                var ShippingWeightCost = CalculateShippingRate(TotalWeight, shippingCalculator._weightRates);
+                //var ApiCalculatedWeight =  ShippingApiClient.get
+                var shippingapiclient = new ShippingApiClient();
+                var apiweightCost = shippingapiclient.GetRate(decimal.Parse( salesOrder.DeliveryPostalCode), decimal.Parse(salesOrder.DeliveryPostalCode), TotalWeight);
+                var ShippingAPICost = CalculateShippingRate(TotalWeight, shippingCalculator._apiRates, apiweightCost);
+                shippingCost = GetMax(ShippingPriceCost, ShippingWeightCost, ShippingAPICost);
+
+            }
+
+
+            return shippingCost;
+
+        }
+        public decimal CalculateShippingRate(decimal TotalPrice, List&lt;ShippingPriceRate&gt; shippingPriceRates)
+        {
+            decimal shippingPriceRate = shippingPriceRates.Where(w =&gt; TotalPrice &gt;= w.PriceMin &amp;&amp; (TotalPrice &lt;= w.PriceMax || w.PriceMax == null )).Select(s=&gt; s.Rate).DefaultIfEmpty().Max();
+            return shippingPriceRate;
+        }
+
+        public decimal CalculateShippingRate(decimal TotalWeight, List&lt;ShippingWeightRate&gt; shippingWeightRates)
+        {
+            decimal shippingWeightRate = shippingWeightRates.Where(w =&gt; TotalWeight &gt;= w.WeighMin &amp;&amp; (TotalWeight &lt;= w.WeighMax || w.WeighMax == null)).Select(s =&gt; s.Rate).DefaultIfEmpty().Max();
+            return shippingWeightRate;
+        }
+        public decimal CalculateShippingRate(decimal TotalWeight, List&lt;ShippingAPIRate&gt; shippingAPIRates, decimal ShippingWeightCost)
+        {
+            decimal retVal = 0.00m;
+            var shippingAPIWeightRate =  shippingAPIRates.Where(w =&gt; TotalWeight &gt;= w.WeighMin &amp;&amp; (TotalWeight &lt;= w.WeighMax || w.WeighMax == null)).ToList();
+            if (shippingAPIWeightRate.Count() &gt; 0 &amp;&amp; ShippingWeightCost != 0.00m)
+            {
+                foreach (ShippingAPIRate apiRate in shippingAPIWeightRate)
+                {
+                    var tempRate = 0.00m;
+                    if (apiRate.RateAdjustmentPrice.HasValue)
+                    {
+                        tempRate = ShippingWeightCost + apiRate.RateAdjustmentPrice.Value;
+                        if (retVal &lt; tempRate)
+                            retVal = tempRate;
+                    }
+                    if (apiRate.RateAdjustmentPercent.HasValue)
+                    {
+                        tempRate = ShippingWeightCost + (ShippingWeightCost * apiRate.RateAdjustmentPercent.Value / 100);
+                        if (retVal &lt; tempRate)
+                            retVal = tempRate;
+                    }
+
+                }
+
+
+            }
+
+            return retVal;
+        }
+
+        public static decimal GetMax(decimal shippingPriceRate, decimal shippingWeightRate,decimal shippingAPIRate)
+        {
+            return Math.Max(shippingPriceRate, Math.Max( shippingWeightRate, shippingAPIRate));
+        }
+
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[15,9,15,36,1],[16,9,16,10,1],[17,13,23,15,1],[24,13,29,15,1],[30,13,35,15,1],[36,9,36,10,1],[48,9,48,10,1],[50,13,50,42,1],[53,13,53,68,1],[54,13,54,14,1],[55,17,55,43,1],[56,17,56,45,1],[58,17,58,24,1],[58,26,58,50,1],[58,51,58,53,1],[58,54,58,70,1],[59,17,59,18,1],[60,21,60,74,1],[61,21,61,51,1],[62,25,62,88,1],[63,17,63,18,1],[65,17,65,82,1],[66,17,66,107,1],[67,17,67,110,1],[69,17,69,65,1],[70,17,70,96,1],[71,17,71,119,1],[72,17,72,95,1],[74,13,74,14,1],[77,13,77,33,1],[79,9,79,10,1],[81,9,81,10,1],[82,13,82,71,1],[82,71,82,148,1],[82,148,82,161,1],[82,161,82,167,1],[82,167,82,192,1],[82,13,82,192,1],[83,13,83,38,1],[84,9,84,10,1],[87,9,87,10,1],[88,13,88,73,1],[88,73,88,151,1],[88,151,88,165,1],[88,165,88,171,1],[88,171,88,196,1],[88,13,88,196,1],[89,13,89,39,1],[90,9,90,10,1],[92,9,92,10,1],[93,13,93,36,1],[94,13,94,70,1],[94,70,94,148,1],[94,148,94,159,1],[94,13,94,159,1],[95,13,95,82,1],[96,13,96,14,1],[97,17,97,24,1],[97,26,97,49,1],[97,50,97,52,1],[97,53,97,74,1],[98,17,98,18,1],[99,21,99,42,1],[100,21,100,62,1],[101,21,101,22,1],[102,25,102,91,1],[103,25,103,47,1],[104,29,104,47,1],[105,21,105,22,1],[106,21,106,64,1],[107,21,107,22,1],[108,25,108,122,1],[109,25,109,47,1],[110,29,110,47,1],[111,21,111,22,1],[113,17,113,18,1],[116,13,116,14,1],[118,13,118,27,1],[119,9,119,10,1],[122,9,122,10,1],[123,13,123,96,1],[124,9,124,10,1]]);
+    </script>
+  </body>
+</html>
